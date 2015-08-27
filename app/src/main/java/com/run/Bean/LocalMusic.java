@@ -8,7 +8,7 @@ public class LocalMusic {
     private String musicNameString; //音乐名称
     private String artistString; //音乐艺术家
     private String musicPathString; //文件路径
-    private int musicTimeLengthInt; //秒级计数
+    private Integer musicTimeLengthInt; //秒级计数
 
     public String getArtistString() {
         return artistString;
@@ -34,11 +34,11 @@ public class LocalMusic {
         this.musicPathString = musicPathString;
     }
 
-    public int getMusicTimeLengthInt() {
+    public Integer getMusicTimeLengthInt() {
         return musicTimeLengthInt;
     }
 
-    public void setMusicTimeLengthInt(int musicTimeLengthInt) {
+    public void setMusicTimeLengthInt(Integer musicTimeLengthInt) {
         this.musicTimeLengthInt = musicTimeLengthInt;
     }
 }
