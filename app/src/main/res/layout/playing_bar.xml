@@ -17,20 +17,23 @@
         android:layout_height="wrap_content"/>
 
     <ImageButton
-        android:id="@+id/playing"
-        android:layout_toRightOf="@id/music_name"
+        android:id="@+id/next_music"
+        android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <ImageButton
-        android:id="@+id/next_music"
-        android:layout_toRightOf="@id/playing"
+        android:id="@+id/playing"
+        android:layout_toRightOf="@id/music_name"
+        android:layout_toLeftOf="@id/next_music"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <ProgressBar
         android:id="@+id/playing_progress"
         android:layout_below="@id/music_icon"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>
 
