@@ -7,6 +7,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.run.Bean.LocalMusic;
+import com.run.coolmusic.CoolMusicApplication;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 
 //problem:music_art_path 没有用
 public class LocalMusicGetter {
+
+    public static final String LOCAL_MUSIC_GETTER_TAG = "LocalMusicGetter:";
 
     public static final int MUSIC_FILE_PATH = 1;
     public static final int MUSIC_NAME = 2;
@@ -35,15 +38,9 @@ public class LocalMusicGetter {
 
     private static LocalMusicGetter music_info = null;
 
-    public static LocalMusicGetter newInstance(Context context)
-    {
-        if(music_info == null)
-            music_info = new LocalMusicGetter(context);
-        return music_info;
-    }
-
-    private LocalMusicGetter(Context context) {
+    public LocalMusicGetter(Context context) {
         this.context = context;
+        initialize();
     }
 
     public void initialize() {
@@ -83,6 +80,7 @@ public class LocalMusicGetter {
                 music_art_path = "null";
                 album_cursor.close();
                 music_list.add(createMusicBean(music_name,music_file_path,music_artist));
+                Log.i(CoolMusicApplication.COOL_MUSIC_TAG,"running?");
             }
         }
         music_cursor.close();
