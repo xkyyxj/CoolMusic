@@ -28,7 +28,7 @@ public class LocalMusicListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return localMusicList == null ? 0 : localMusicList.size();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class LocalMusicListAdapter extends BaseAdapter {
             holder = (ViewHolder)convertView.getTag();
         holder.musicname.setText(temp.getMusicNameString());
         holder.musicartist.setText(temp.getArtistString());
-        holder.musictimelength.setText(temp.getMusicTimeLengthInt());
+        //holder.musictimelength.setText(temp.getMusicTimeLengthInt());
         return convertView;
     }
 
