@@ -31,9 +31,9 @@ public class LocalMusicActivity extends Activity {
     private List<LocalMusic> localMusicList = null;
 
     private ListView musicList;
-    private TextView title,music_name;
-    private Button return_button;
-    private ImageView music_icon;
+    private TextView title, musicName,musicArtist;
+    private Button returnButton;
+    private ImageView musicIcon;
     private ImageButton playing,next;
     private SeekBar progress;
 
@@ -75,12 +75,13 @@ public class LocalMusicActivity extends Activity {
     private void assignViews() {
         musicList = (ListView) findViewById(R.id.music_list);
         title = (TextView) findViewById(R.id.header_title);
-        return_button = (Button) findViewById(R.id.header_return_button);
+        returnButton = (Button) findViewById(R.id.header_return_button);
         playing = (ImageButton) findViewById(R.id.playing);
         next = (ImageButton) findViewById(R.id.next_music);
-        music_name = (TextView) findViewById(R.id.music_name);
+        musicName = (TextView) findViewById(R.id.music_name);
         progress = (SeekBar) findViewById(R.id.playing_progress);
-        music_icon = (ImageView) findViewById(R.id.music_icon);
+        musicIcon = (ImageView) findViewById(R.id.music_icon);
+        musicArtist = (TextView) findViewById(R.id.music_artist);
     }
 
     /*
@@ -126,7 +127,7 @@ public class LocalMusicActivity extends Activity {
         });
         //各个按钮监听
         LocalMusicButtonListener buttonListener = new LocalMusicButtonListener();
-        return_button.setOnClickListener(buttonListener);
+        returnButton.setOnClickListener(buttonListener);
         playing.setOnClickListener(buttonListener);
         next.setOnClickListener(buttonListener);
         //为代表本地音乐列表的ListView设置Adapter
@@ -139,7 +140,8 @@ public class LocalMusicActivity extends Activity {
         //获取对应音乐Bean
         LocalMusic temp = localMusicList.get(position);
         //设置playBar的相关UI信息
-        music_name.setText(temp.getMusicNameString());
+        musicName.setText(temp.getMusicNameString());
+        musicArtist.setText(temp.getArtistString());
         //TODO 设置音乐的图片信息，也就是musicIcon
         //试图播放音乐
         try {
