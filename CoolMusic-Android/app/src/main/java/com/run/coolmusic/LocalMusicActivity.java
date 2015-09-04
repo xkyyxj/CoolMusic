@@ -1,11 +1,12 @@
 package com.run.coolmusic;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -22,7 +23,7 @@ import com.run.Services.PlayService;
 import java.io.IOException;
 import java.util.List;
 
-public class LocalMusicActivity extends AppCompatActivity {
+public class LocalMusicActivity extends Activity {
 
     public static final String LOCAL_MUSIC_ACTIVITY_TAG = "LocalMusicActivity:";
 
@@ -40,6 +41,7 @@ public class LocalMusicActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_local_music_list);
         init();
     }
@@ -108,6 +110,8 @@ public class LocalMusicActivity extends AppCompatActivity {
     private void initView()
     {
         assignViews();
+        //PlayBar 播放按钮设置背景图片
+        playing.setImageResource(R.mipmap.play_button);
         //设置标题栏
         title.setText(R.string.local_music_title);
         //为各个组件设置监听
@@ -141,8 +145,10 @@ public class LocalMusicActivity extends AppCompatActivity {
         try {
             playService.play(temp.getMusicPathString());
         } catch (IOException e) {
-        e.printStackTrace();
-    }
+            e.printStackTrace();
+        }
+        //PlayBar 播放按钮背景图片切换 R.mipmap.play_button -> R.mipmap.pause
+        playing.setImageResource(R.mipmap.pause);
     }
 
     //音乐播放滑动条监听器
@@ -181,10 +187,14 @@ public class LocalMusicActivity extends AppCompatActivity {
                 //播放栏播放\暂停按钮
                 case R.id.playing:
                     boolean tempState = playService.isPlaying();
-                    if(tempState)
+                    if(tempState) {
                         playService.pause();
-                    else
+                        playing.setImageResource(R.mipmap.play_button);
+                    }
+                    else {
                         playService.reStart();
+                        playing.setImageResource(R.mipmap.pause);
+                    }
                     break;
                 //播放栏下一首音乐按钮
                 case R.id.next_music:
