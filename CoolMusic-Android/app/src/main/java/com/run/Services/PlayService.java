@@ -2,6 +2,8 @@ package com.run.Services;
 
 import android.media.MediaPlayer;
 
+import com.run.Bean.LocalMusic;
+
 import java.io.IOException;
 
 /**
@@ -11,11 +13,23 @@ public class PlayService {
 
     private boolean isPlaying = false;//是否正在播放
     private boolean hasPaused = false;//是否正在暂停播放
+
+    private LocalMusic nextMusic;
+
+    private OnPlayServiceCompletionListener listener;
+
     MediaPlayer player = null;
 
     public PlayService()
     {
         player = new MediaPlayer();
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                if(listener != null)
+                    listener.onCompletion(PlayService.this);
+            }
+        });
     }
 
     /*
@@ -57,13 +71,14 @@ public class PlayService {
     }
 
     public void reStart(){
-        if(player != null)
+        if(player != null && hasPaused) {
             player.start();
+            isPlaying = true;
+            hasPaused = false;
 //        else
             //player被释放之后的处置措施
             //重建，并且应当保存上一次播放的歌曲信息以及播放时长
-        isPlaying = true;
-        hasPaused = false;
+        }
     }
 
     public boolean isPlaying()
@@ -71,4 +86,15 @@ public class PlayService {
         return isPlaying;
     }
 
+    public void setNextMusic(LocalMusic nextMusic) {
+        this.nextMusic = nextMusic;
+    }
+
+    public void setOnPlayServiceCompletionListener(OnPlayServiceCompletionListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnPlayServiceCompletionListener {
+        void onCompletion(PlayService playService);
+    }
 }

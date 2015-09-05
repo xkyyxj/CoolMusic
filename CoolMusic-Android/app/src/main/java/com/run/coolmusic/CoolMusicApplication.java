@@ -2,6 +2,7 @@ package com.run.coolmusic;
 
 import android.app.Application;
 
+import com.run.Bean.PlayerStatus;
 import com.run.Services.LocalMusicGetter;
 
 /**
@@ -13,10 +14,12 @@ public class CoolMusicApplication extends Application {
 
     private LocalMusicGetter localMusicList;
 
+    private PlayerStatus playerStatus;
+
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
+        playerStatus = new PlayerStatus();
     }
 
     public LocalMusicGetter getLocalMusicList() {
@@ -25,5 +28,9 @@ public class CoolMusicApplication extends Application {
 
     public void setLocalMusicList(LocalMusicGetter localMusicList) {
         this.localMusicList = localMusicList;
+    }
+
+    public PlayerStatus getPlayerStatus() {
+        return playerStatus;
     }
 }

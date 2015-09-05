@@ -1,6 +1,8 @@
 package com.run.coolmusic;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,8 +19,10 @@ import android.widget.TextView;
 
 import com.run.Adapter.LocalMusicListAdapter;
 import com.run.Bean.LocalMusic;
+import com.run.Bean.PlayerStatus;
 import com.run.Services.LocalMusicGetter;
 import com.run.Services.PlayService;
+import com.run.Utils.MusicListOperation;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,12 +35,15 @@ public class LocalMusicActivity extends Activity {
     private List<LocalMusic> localMusicList = null;
 
     private ListView musicList;
-    private TextView title, musicName,musicArtist;
-    private Button returnButton;
+    private TextView title, musicName, musicArtist;
+    private Button returnButton, configButton;
     private ImageView musicIcon;
-    private ImageButton playing,next;
+    private ImageButton playing, next;
     private SeekBar progress;
 
+    private LocalMusic nextMusic;
+
+    private int currentPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +89,7 @@ public class LocalMusicActivity extends Activity {
         progress = (SeekBar) findViewById(R.id.playing_progress);
         musicIcon = (ImageView) findViewById(R.id.music_icon);
         musicArtist = (TextView) findViewById(R.id.music_artist);
+        configButton = (Button) findViewById(R.id.config_button);
     }
 
     /*
@@ -94,6 +102,7 @@ public class LocalMusicActivity extends Activity {
     {
         //初始化音乐播放服务
         playService = new PlayService();
+        playService.setOnPlayServiceCompletionListener(new LocalPlayServiceCompletionListener());
         //Application保存了一份本地音乐列表，从中取出
         CoolMusicApplication application = (CoolMusicApplication)getApplication();
         LocalMusicGetter localMusicGetter = application.getLocalMusicList();
@@ -130,13 +139,15 @@ public class LocalMusicActivity extends Activity {
         returnButton.setOnClickListener(buttonListener);
         playing.setOnClickListener(buttonListener);
         next.setOnClickListener(buttonListener);
+        configButton.setOnClickListener(buttonListener);
         //为代表本地音乐列表的ListView设置Adapter
-        musicList.setAdapter(new LocalMusicListAdapter(this ,localMusicList));
+        musicList.setAdapter(new LocalMusicListAdapter(this, localMusicList));
     }
 
     //用户点击列表某一项然后播放对应音乐
     private void clickToPlay(int position)
     {
+        currentPosition = position;
         //获取对应音乐Bean
         LocalMusic temp = localMusicList.get(position);
         //设置playBar的相关UI信息
@@ -151,6 +162,48 @@ public class LocalMusicActivity extends Activity {
         }
         //PlayBar 播放按钮背景图片切换 R.mipmap.play_button -> R.mipmap.pause
         playing.setImageResource(R.mipmap.pause);
+        //设定播放器下一首要播放的音乐
+        nextMusic = MusicListOperation.getNext(this,currentPosition,localMusicList);
+    }
+
+    private void completeAndPlay(PlayService playService) {
+        try {
+            playService.play(nextMusic.getMusicPathString());
+            currentPosition = MusicListOperation.getNextMusicPosition();
+        } catch (IOException e) {
+            e.printStackTrace();
+            //TODO 异常处理工作
+        }
+        //设置playBar的相关UI信息
+        musicName.setText(nextMusic.getMusicNameString());
+        musicArtist.setText(nextMusic.getArtistString());
+        nextMusic = MusicListOperation.getNext(this,currentPosition,localMusicList);
+    }
+
+    private void setCircleWay() {
+        //弹出对话框，使用户选择音乐循环方式
+        AlertDialog.Builder builder = new AlertDialog.Builder(LocalMusicActivity.this);
+        builder.setSingleChoiceItems(R.array.music_cricle_way, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //播放器状态对象存放在全局Application当中
+                PlayerStatus playerStatus = ((CoolMusicApplication)getApplication()).getPlayerStatus();
+                switch(which){
+                    case 0:
+                        playerStatus.setPlayStateInteger(PlayerStatus.SINGLE);
+                        break;
+                    case 1:
+                        playerStatus.setPlayStateInteger(PlayerStatus.LIST_CIRCLE);
+                        break;
+                    case 2:
+                        playerStatus.setPlayStateInteger(PlayerStatus.RANDOM);
+                        break;
+                }
+                //每次切换播放模式的时候，都要重新获取下一首音乐信息，使被切换到的模式可以立即生效
+                //避免上一次的模式生成的下一首音乐造成影响
+                nextMusic = MusicListOperation.getNext(LocalMusicActivity.this,currentPosition,localMusicList);
+            }
+        }).show();
     }
 
     //音乐播放滑动条监听器
@@ -200,9 +253,20 @@ public class LocalMusicActivity extends Activity {
                     break;
                 //播放栏下一首音乐按钮
                 case R.id.next_music:
-                    //TODO 下一首音乐的逻辑实现：列表循环、随机播放等
+                    completeAndPlay(playService);
+                    break;
+                case R.id.config_button:
+                    setCircleWay();
                     break;
             }
+        }
+    }
+
+    class LocalPlayServiceCompletionListener implements PlayService.OnPlayServiceCompletionListener {
+
+        @Override
+        public void onCompletion(PlayService playService) {
+            completeAndPlay(playService);
         }
     }
 
